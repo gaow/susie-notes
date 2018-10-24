@@ -1,0 +1,65 @@
+\section{\susie VEM updates}
+
+This section derives equations (A.29) -- (A.36) in the manuscript. 
+
+\subsection{Bayesian univariate regression} \label{sec:bur}
+
+This corresponds to equations (2.4) -- (2.11) in the manuscript. Here I show results for (2.7) -- (2.11).
+
+By Bayes rule,
+\begin{equation}
+    \post(b|\vy, \rv, \rv_0) = \frac{p(\vy|\rv,b)p(b|\rv_0)}{p(\vy|\rv, \rv_0)}
+\end{equation}
+where the prior
+\begin{equation}
+    \log p(b|\rv_0) = -\frac{1}{2}\log (2\pi\rv_0) - \frac{1}{2\rv}b^2
+\end{equation}
+and log-likelihood
+\begin{equation}
+\log p(\vy|\rv, b) = -\frac{n}{2}\log(2\pi\rv) - \frac{1}{2\rv}\norm{\vy - \vx b}^2
+\end{equation}
+
+The marginal log-likelihood is:
+\begin{align}
+    \log p(\vy|\rv, \rv_0) &= \int p(\vy|\rv, b) p(b|\rv_0)\dif b \label{eqn:bur_marginal}\\
+    & = \int \big(-\frac{n}{2} \log(2\pi\rv) - \frac{1}{2\rv}\norm{\vy-\vx b}^2 - \frac{1}{2}\log(2\pi) - \frac{1}{2}\log\rv_0 - \frac{1}{2\rv_0}\norm{b}^2\big)\dif b \\
+    & = -\frac{n}{2}\log (2\pi\rv) - \frac{1}{2}\log(2\pi) - \frac{1}{2}\log \rv_0 \\
+    & -\frac{1}{2} \int \big( \frac{\vy^T\vy - 2b\vx^T\vy + \vx^T b^2\vx}{\rv} + \frac{b^2}{\rv_0}\big) \dif b \label{eqn:bur_kernel}
+\end{align}
+
+Let $\tau_n = \vx^T\vx + \frac{\rv}{\rv_0}$, $\mu_1 = \vx^T\vy / \tau_n = \vx^T\vx \hat{b} / \tau_n$ where $\hat{b}$ is OLS estimate of regression coefficient. Then
+\begin{align}
+    \eqref{eqn:bur_kernel} &= -\frac{1}{2}\int (\tau_nb^2 - 2\tau_n \mu_1 b + \vy^T\vy) / \rv \dif b \\ 
+    &= -\frac{1}{2}\int \big[ \tau_n(b^2 - 2\mu_1 b + \mu_1^2) / \rv + (\vy^T\vy - \tau_n\mu_1^2) / \rv \big] \dif b \\ 
+    &= \frac{1}{2} \int \big[\norm{b-\mu_1}^2 / (\rv/\tau_n) + (\vy^T\vy - \tau_n\mu_1^2) / \rv \big] \dif b
+\end{align}
+
+Let $\rv_1 = \rv / \tau_n$, 
+\begin{align}
+    \eqref{eqn:bur_marginal} &= -\frac{n}{2}\log(2\pi\rv) - \frac{1}{2} \log \rv_0 \\
+    &+ \int \big[-\frac{1}{2} \log(2\pi\rv_1) - \frac{1}{2\rv_1}\norm{b-\mu_1}^2 \big] \dif b \\
+    &+ \frac{1}{2}\log \rv_1 - \frac{\vy^T\vy}{2\rv} + \frac{\mu_1^2}{2\rv_1} \\
+    &= -\frac{n}{2}\log(2\pi\rv) - \frac{1}{2} \log \rv_0 + \frac{1}{2}\log \rv_1 - \frac{\vy^T\vy}{2\rv} + \frac{\mu_1^2}{2\rv_1} \label{eqn:bur_marginal_result}
+\end{align}
+
+The log Bayes Factor is
+\begin{align}
+    \log \BF := \log p(\vy|\rv, \rv_0) - \log p(\vy | \rv) \\
+    &= \eqref{eqn:bur_marginal_result} - (-\frac{n}{2}\log(2\pi\rv) - \frac{\vy^T\vy}{2\rv}) \\
+    &= - \frac{1}{2} \log \rv_0 + \frac{1}{2}\log \rv_1 + \frac{\mu_1^2}{2\rv_1}
+\end{align}
+Thus 
+\begin{equation}
+\BF(\vy, \vx; \rv, \rv_0) = (\rv_0/\rv_1)^\frac{1}{2}\exp(\frac{\mu_1^2}{2\rv_1})
+\end{equation}
+
+\subsection{Bayesian single effect multiple regression} \label{sec:bser}
+
+This section deals with model (2.12) -- (2.21) in the manuscript. Here we derive equation (2.18). For each single effect $j$ the posterior inclusion probability is
+\begin{align}
+    \valpha_j &= p(\gamma_j = 1 | \vy, \rv, \rv_0) \\
+    &= \frac{p(\vy | \gamma_j = 1, \rv, \rv_0)p(\gamma_j=1)}{\sum_j p(\vy | \gamma_j = 1, \rv, \rv_0)p(\gamma_j=1)} \\
+    &= \pi_j \frac{p(\vy | \gamma_j = 1, \rv, \rv_0) / p(\vy|\rv)}{\sum_j \pi_j p(\vy | \gamma_j = 1, \rv, \rv_0) / p(\vy | \rv)} \\
+    &= \pi_j \frac{\BF(\vy, \vx_j; \rv, \rv_0)}{\sum_j \pi_j \BF(\vy, \vx_j; \rv, \rv_0)}
+\end{align}
+Derivations of single effect Bayes factors and posteriors follow directly from Section \ref{sec:bur}. We have now completed derivation of equations (A.29) -- (A.36) of the manuscript.
