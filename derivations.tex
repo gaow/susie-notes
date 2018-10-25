@@ -4,9 +4,7 @@ This section derives equations (A.29) -- (A.36) in the manuscript.
 
 \subsection{Bayesian univariate regression} \label{sec:bur}
 
-This corresponds to equations (2.4) -- (2.11) in the manuscript. Here I show results for (2.7) -- (2.11).
-
-By Bayes rule,
+This corresponds to equations (2.4) -- (2.11) in the manuscript. Here I show results for (2.7) -- (2.11). By Bayes rule,
 \begin{equation}
     \post(b|\vy, \rv, \rv_0) = \frac{p(\vy|\rv,b)p(b|\rv_0)}{p(\vy|\rv, \rv_0)}
 \end{equation}
@@ -19,9 +17,9 @@ and log-likelihood
 \log p(\vy|\rv, b) = -\frac{n}{2}\log(2\pi\rv) - \frac{1}{2\rv}\norm{\vy - \vx b}^2
 \end{equation}
 
-The marginal log-likelihood is:
+Given $\rv$ and $\rv_0$ the marginal log-likelihood is:
 \begin{align}
-    \log p(\vy|\rv, \rv_0) &= \int p(\vy|\rv, b) p(b|\rv_0)\dif b \label{eqn:bur_marginal}\\
+    \log p(\vy|\rv, \rv_0) &= \log \int p(\vy|\rv, b) p(b|\rv_0)\dif b \label{eqn:bur_marginal}\\
     & = \int \big(-\frac{n}{2} \log(2\pi\rv) - \frac{1}{2\rv}\norm{\vy-\vx b}^2 - \frac{1}{2}\log(2\pi) - \frac{1}{2}\log\rv_0 - \frac{1}{2\rv_0}\norm{b}^2\big)\dif b \\
     & = -\frac{n}{2}\log (2\pi\rv) - \frac{1}{2}\log(2\pi) - \frac{1}{2}\log \rv_0 \\
     & -\frac{1}{2} \int \big( \frac{\vy^T\vy - 2b\vx^T\vy + \vx^T b^2\vx}{\rv} + \frac{b^2}{\rv_0}\big) \dif b \label{eqn:bur_kernel}
@@ -42,7 +40,12 @@ Let $\rv_1 = \rv / \tau_n$,
     &= -\frac{n}{2}\log(2\pi\rv) - \frac{1}{2} \log \rv_0 + \frac{1}{2}\log \rv_1 - \frac{\vy^T\vy}{2\rv} + \frac{\mu_1^2}{2\rv_1} \label{eqn:bur_marginal_result}
 \end{align}
 
-The log Bayes Factor is
+Posterior of $b$ is given by
+\begin{equation}
+b | \vy, \rv, \rv_0 \sim N(\mu_1, \rv_1)
+\end{equation}
+
+The log Bayes factor is
 \begin{align}
     \log \BF := \log p(\vy|\rv, \rv_0) - \log p(\vy | \rv) \\
     &= \eqref{eqn:bur_marginal_result} - (-\frac{n}{2}\log(2\pi\rv) - \frac{\vy^T\vy}{2\rv}) \\
@@ -50,7 +53,7 @@ The log Bayes Factor is
 \end{align}
 Thus 
 \begin{equation}
-\BF(\vy, \vx; \rv, \rv_0) = (\rv_0/\rv_1)^\frac{1}{2}\exp(\frac{\mu_1^2}{2\rv_1})
+\BF(\vy, \vx; \rv, \rv_0) = (\rv_0/\rv_1)^{-\frac{1}{2}}\exp(\frac{\mu_1^2}{2\rv_1})
 \end{equation}
 
 \subsection{Bayesian single effect multiple regression} \label{sec:bser}
@@ -62,4 +65,39 @@ This section deals with model (2.12) -- (2.21) in the manuscript. Here we derive
     &= \pi_j \frac{p(\vy | \gamma_j = 1, \rv, \rv_0) / p(\vy|\rv)}{\sum_j \pi_j p(\vy | \gamma_j = 1, \rv, \rv_0) / p(\vy | \rv)} \\
     &= \pi_j \frac{\BF(\vy, \vx_j; \rv, \rv_0)}{\sum_j \pi_j \BF(\vy, \vx_j; \rv, \rv_0)}
 \end{align}
-Derivations of single effect Bayes factors and posteriors follow directly from Section \ref{sec:bur}. We have now completed derivation of equations (A.29) -- (A.36) of the manuscript.
+Derivations of single effect Bayes factors and posteriors follow directly from Section \ref{sec:bur}. We have now completed derivation of equations (A.29) -- (A.36) of the manuscript, the core updates of the \susie VEM algorithm.
+
+\section{ELBO updates}
+
+This section shows derivation of equation (A.19) for \susie model. It involves the ERSS in (A.19), the conditional likelihood in (A.40) and the marginal likelihood in (A.46) for Bayesian single effect model in Section \ref{sec:bser}. 
+
+\subsection{ERSS}
+
+Analytic form of ERSS can be obtained by putting together (A.22), (A.24), (A.26), (A.37) and (A.38). (A.22) is derived in (A.48).
+
+\subsection{Marginal likelihood for the $l$-th effect}
+
+For single effect model,
+\begin{align}
+    \log L(\vy; \rv, \rv_0) &= \log \int p(\vy | \vb, \rv, \rv_0) p(\vb | \rv, \rv_0) \dif \vb\\
+    &= \log \iint p(\vy | \vb, \vgamma, \rv, \rv_0) p(\vb | \vgamma, \rv_0) p(\vgamma | \vpi)  \dif \vb \dif \vgamma \\
+    &= \log \int \sum_j p(\vy | b_j, \rv, \rv_0) p(b_j|\gamma_j = 1, \rv_0) p(\gamma_j = 1 | \vpi) \dif b_j \\
+    &= \log \sum_j \pi_j \int N(\vy; \vx_jb_j, \rv I_n) N(b_j; 0, \rv_0) \dif b_j \\
+    &= \log \sum_j \pi_j p(\vy|\vx_j, \rv, \rv_0) \\
+    &= \log \sum_j \pi_j \big[\BF(\vy, \vx_j; \rv, \rv_0)p(\vy|\rv) \big]\\
+    &= \log N(y; 0, \rv I_n) + \log \sum_j \pi_j \BF(\vy, \vx_j; \rv, \rv_0)
+\end{align}
+
+\subsection{Conditional likelihood for the $l$-th effect}
+
+To compute conditional likelihood for single effect model we are left to deal with $\E_{q_l}\norm{\vy - \vmu_l}^2$ in Equation (A.46) in the manuscript,
+\begin{align}
+    \E_{q_l}\norm{\vy - \vmu_l}^2 &= \E_{q_l}\norm{\vy - \mx\vb_l}^2 \\
+    &= \vy^T\vy - 2\vy^T\mx \E_{q_l}[\vb_l] + \mx^T\mx \E_{q_l}[\vb_l^T\vb_l]
+\end{align}
+where the expectations (first and second moments) are given by (A.37) and (A.38) in the manuscript.
+
+\section{Update residual variance}
+This is a crucial step but is trivial to derive for univariate case ($\vy$ is a vector). It is given by Equation (A.23) in the manuscript.
+
+\section{\susie updates using summary statistics}
