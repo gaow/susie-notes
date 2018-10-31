@@ -1,3 +1,20 @@
+\section{\susie model}
+
+To recap,
+\begin{align}
+\vy &= \mx\vb + \ve \\
+\ve & \sim N(0,\rv I_n) \\ 
+\vb &= \sum_{l=1}^L \vb_l\\
+\vb_l & = \vgamma_l b_l \qquad (\text{independently for } l=1,\dots,L)\\
+\vgamma_l & \sim \text{Mult}(1,\vpi) \\
+b_l & \sim N(0,\rv_{0l}).
+\end{align}
+
+We use a mean-field approximation to posterior,
+\begin{align}
+q(\vb_1, \ldots, \vb_L) = \prod_l q_l(\vb_l)
+\end{align}
+
 \section{\susie VEM updates}
 
 This section derives equations (A.29) -- (A.36) in the manuscript. 
@@ -10,7 +27,7 @@ This corresponds to equations (2.4) -- (2.11) in the manuscript. Here I show res
 \end{equation}
 where the prior
 \begin{equation}
-    \log p(b|\rv_0) = -\frac{1}{2}\log (2\pi\rv_0) - \frac{1}{2\rv}b^2
+    \log p(b|\rv_0) = -\frac{1}{2}\log (2\pi\rv_0) - \frac{1}{2\rv_0}b^2
 \end{equation}
 and log-likelihood
 \begin{equation}
@@ -47,7 +64,7 @@ b | \vy, \rv, \rv_0 \sim N(\mu_1, \rv_1)
 
 The log Bayes factor is
 \begin{align}
-    \log \BF := \log p(\vy|\rv, \rv_0) - \log p(\vy | \rv) \\
+    \log \BF & := \log p(\vy|\rv, \rv_0) - \log p(\vy | \rv) \\
     &= \eqref{eqn:bur_marginal_result} - (-\frac{n}{2}\log(2\pi\rv) - \frac{\vy^T\vy}{2\rv}) \\
     &= - \frac{1}{2} \log \rv_0 + \frac{1}{2}\log \rv_1 + \frac{\mu_1^2}{2\rv_1}
 \end{align}
@@ -69,35 +86,162 @@ Derivations of single effect Bayes factors and posteriors follow directly from S
 
 \section{ELBO updates}
 
-This section shows derivation of equation (A.19) for \susie model. It involves the ERSS in (A.19), the conditional likelihood in (A.40) and the marginal likelihood in (A.46) for Bayesian single effect model in Section \ref{sec:bser}. 
+This section shows derivation of equation (A.19) for \susie model. It involves the ERSS in (A.19), the conditional likelihood in (A.40) and the marginal likelihood in (A.46) for Bayesian single effect model in Section \ref{sec:bser}: 
+
+\begin{align}
+    F(\q,\g,\rv; \vy) &= -\frac{n}{2} \log(2\pi\rv) -\frac{1}{2\rv}\E_{\q}\norm{\vy-\sum_l \vmu_l}^2 + \sum_l \E_{q_l}\left[\log\frac{g_l(\vmu_l)}{q_l(\vmu_l)} \right] \label{eqn:Fexplicit}\\
+    &= -\frac{n}{2} \log(2\pi\rv) - \frac{1}{2\rv} \ERSS(\vy,\emu,\emusq) + \sum_l \E_{q_l}\left[ \log\frac{g_l(\vmu_l)}{q_l(\vmu_l)} \right]  
+\end{align}
 
 \subsection{ERSS}
 
-Analytic form of ERSS can be obtained by putting together (A.22), (A.24), (A.26), (A.37) and (A.38). (A.22) is derived in (A.48).
+Analytic form of ERSS for \susie model can be obtained by putting together (A.22), (A.24), (A.26), (A.37) and (A.38). (A.22) is derived in (A.48) -- (A.50).
 
-\subsection{Marginal likelihood for the $l$-th effect}
+Specifically, for \susie model $\vmu_l = \mx \vb_l$. Let $\bb_{l_j} = \E_{q_l}[b_{l_j}]$, $\bbb_{l_j} = \E_{q_l}[b^2_{l_j}]$, and $\vbb = \sum_l \vbb_{l}$. ERSS in (A.50) can be written as:
+\begin{align}
+    \ERSS(\vy,\emu,\emusq) &= \norm{\vy-\sum_l \emul}^2 - \sum_l \bar{\vmu_l}^T \bar{\vmu_l} + \sum_l \sum_i \E_{q_l}[(\mu_{l_i})^2] \\
+    &= \norm{\vy-\sum_l \mx \vbb_l}^2 - \sum_l (\mx \vbb_l)^T (\mx \vbb_l) + \sum_l \sum_i \sum_{j} \mx_{ij}^{2}  \bbb_{lj} \\
+    &= \vy^T\vy - 2 \vy^T (\sum_l \mx \vbb_l) + (\sum_l \mx \vbb_l)^T(\sum_l \mx \vbb_l) - \sum_l (\mx \vbb_l)^T (\mx \vbb_l) + \sum_l \sum_i \sum_{j} \mx_{ij}^{2}  \bbb_{lj} \\
+    &= \vy^T\vy - 2 \vy^T\mx \bar{\vb} + \bar{\vb}^T \mx^T\mx \bar{\vb} - \sum_l \bar{\vb}_l^T \mx^T \mx \bar{\vb}_l + \sum_l \sum_j (\mx^T \mx)_{jj} \bar{b^2}_{lj} \label{eqn:erss}
+\end{align}
+
+\subsection{Marginal log-likelihood for the $l$-th effect}
 
 For single effect model,
 \begin{align}
-    \log L(\vy; \rv, \rv_0) &= \log \int p(\vy | \vb, \rv, \rv_0) p(\vb | \rv, \rv_0) \dif \vb\\
-    &= \log \iint p(\vy | \vb, \vgamma, \rv, \rv_0) p(\vb | \vgamma, \rv_0) p(\vgamma | \vpi)  \dif \vb \dif \vgamma \\
-    &= \log \int \sum_j p(\vy | b_j, \rv, \rv_0) p(b_j|\gamma_j = 1, \rv_0) p(\gamma_j = 1 | \vpi) \dif b_j \\
-    &= \log \sum_j \pi_j \int N(\vy; \vx_jb_j, \rv I_n) N(b_j; 0, \rv_0) \dif b_j \\
+    \log L(\vy; \rv, \rv_0) &= \log \int p(\vy | \vb_l, \rv, \rv_0) p(\vb_l | \rv, \rv_0) \dif \vb_l\\
+    &= \log \iint p(\vy | \vb_l, \vgamma, \rv, \rv_0) p(\vb_l | \vgamma, \rv_0) p(\vgamma | \vpi)  \dif \vb_l \dif \vgamma \\
+    &= \log \int \sum_j p(\vy | b_{l_j}, \rv, \rv_0) p(b_{l_j}|\gamma_j = 1, \rv_0) p(\gamma_j = 1 | \vpi) \dif b_{l_j} \\
+    &= \log \sum_j \pi_j \int N(\vy; \vx_jb_{l_j}, \rv I_n) N(b_{l_j}; 0, \rv_0) \dif b_{l_j} \\
     &= \log \sum_j \pi_j p(\vy|\vx_j, \rv, \rv_0) \\
     &= \log \sum_j \pi_j \big[\BF(\vy, \vx_j; \rv, \rv_0)p(\vy|\rv) \big]\\
-    &= \log N(y; 0, \rv I_n) + \log \sum_j \pi_j \BF(\vy, \vx_j; \rv, \rv_0)
+    &= \log N(\vy; 0, \rv I_n) + \log \sum_j \pi_j \BF(\vy, \vx_j; \rv, \rv_0) \label{eqn:lmarginal}
 \end{align}
 
-\subsection{Conditional likelihood for the $l$-th effect}
+\subsection{Conditional expected log-likelihood for the $l$-th effect}
 
-To compute conditional likelihood for single effect model we are left to deal with $\E_{q_l}\norm{\vy - \vmu_l}^2$ in Equation (A.46) in the manuscript,
+For single effect model,
+\begin{equation}
+    \E_{q_l}[\log p(\vy|\vb_l,\rv)] = -\frac{n}{2}\log(2\pi\rv) - \frac{1}{2\rv}\E_{q_l}\norm{\vy - \mx\vb_l}^2  \label{eqn:lconditional}
+\end{equation}
+where
 \begin{align}
-    \E_{q_l}\norm{\vy - \vmu_l}^2 &= \E_{q_l}\norm{\vy - \mx\vb_l}^2 \\
-    &= \vy^T\vy - 2\vy^T\mx \E_{q_l}[\vb_l] + \mx^T\mx \E_{q_l}[\vb_l^T\vb_l]
+    \E_{q_l}\norm{\vy - \mx\vb_l}^2 &= \norm{\vy - \mx \E_{q_l}[\vb_{l}]}^2 - \E_{q_l}[\vb_{l}]^T\mx^T\mx \E_{q_l}[\vb_{l}] + \sum_i \sum_j \mx_{ij}^2 \E_{q_l}[b_{lj}^2] \\
+    &= \vy^T\vy -2 \vy^T \mx \vbb_l  + \sum_j (\mx^T \mx)_{jj} \bbb_{lj}
 \end{align}
-where the expectations (first and second moments) are given by (A.37) and (A.38) in the manuscript.
+where the expectations (first and second moments) are given by (A.37) and (A.38) in the manuscript. 
+
+\subsection{Compute ELBO}
+Now we are ready to compute ELBO (A.19).
+Replacing $\vy$ by $\er$ in \eqref{eqn:lmarginal} and \eqref{eqn:lconditional}, we derive (A.46) in the manuscript:
+\begin{align}
+    \E_{\hat{q}_l} \left[ \log \frac{g_l(\vmu_l)}{\hat{q}_l(\vmu_l)} \right] &= \log L_l(\er; g_l,\rv) - \E_{q_l}[\log p(\er|\vmu_l,\rv)]  \\
+    &= \log N(\er; 0, \rv I_n) + \log \sum_j \pi_j \BF(\er, \vx_j; \rv, \rv_0) + \frac{n}{2} \log(2\pi\rv) +\frac{1}{2\rv}\E_{\hat{q}_l}\norm{\er-\vmu_l}^2 \\
+    &= -\frac{n}{2} \log(2\pi\rv) -\frac{1}{2\rv}\er^T\er + \log \sum_j \pi_j \BF(\er, \vx_j; \rv, \rv_0) + \\
+    & \frac{n}{2} \log(2\pi\rv) +\frac{1}{2\rv}\left[\er^T\er - 2\er^T\mx \bar{\vb}_l + \sum_j (\mx^T \mx)_{jj} \bar{\vb}_{lj}^2 \right] \\
+    &= \log \sum_j \pi_j \BF(\er, \vx_j; \rv, \rv_0) + \frac{1}{2\rv}\left[- 2\er^T\mx \bar{\vb}_l + \sum_j (\mx^T \mx)_{jj} \bar{\vb}_{lj}^2\right] \label{eqn:lkl}
+\end{align}
+
+The ELBO is then given by $F(\q,\g,\rv; \vy) = -\frac{n}{2} \log(2\pi\rv) - \frac{1}{2\rv} \eqref{eqn:erss} + \sum_l \eqref{eqn:lkl}$.
 
 \section{Update residual variance}
-This is a crucial step but is trivial to derive for univariate case ($\vy$ is a vector). It is given by Equation (A.23) in the manuscript.
+This is a crucial step but is trivial to derive for univariate case ($\vy$ is a vector). It is given by Equation (A.23) in the manuscript. Specifically for \susie model, $\hat{\rv} = \eqref{eqn:erss}/n$.
 
-\section{\susie updates using summary statistics}
+\section{\susie with summary statistics}
+\subsection{Overview}
+So far we have been working directly with column-centered data $\mx\in \mathbb{R}^{n\times p}$ and $\vy\in\mathbb{R}^{n\times 1}$. In practice, results from genetic association studies are often communicated and shared in terms of ``summary statistics''. Summary-level information in association analysis typically include:
+\begin{enumerate}
+\item Estimated effect size $\hat{b}_j$ and its standard error $\text{SE}(\hat{b}_j)$, from single-SNP analysis for each SNP $j$ (i.e., univariate analysis). 
+\item Sample size of study, $n$.
+\item Variance of a quantitative trait, $\Var(\vy) = \vy^T\vy/(n-1)$ ($\vy$ is pre-centered).
+\item Correlation matrix between SNPs, $\mr=\text{cor}(\mx)$ (or some approximations to it). $\mr$ is commonly known as LD matrix (LD for Linkage Disequilibrium).
+\end{enumerate}
+To analyze summary statistics with \susie, we first verify that \susie VEM updates and ELBO computations depend in the data only through $\mx^T\mx$, $\mx^T\vy$, $n$ and $\vy^T\vy$. We then replace these quantities and provide interface to \susie to work with either of the following summary statistics information:
+\begin{enumerate}
+    \item Sufficient summary statistics: $\hat{b}_j, \text{SE}(\hat{b}_j), \mr, n, \Var(\vy)$
+    \item Univariate testing $z$ scores: $z_j, \mr, n$
+\end{enumerate}
+
+\subsection{VEM updates} \label{sec:vem_update_ss}
+Using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\vy^T\vy$ as input, results for (2.7) -- (2.11), (2.18) in the manuscript still holds. For (A.29) -- (A.36) the only missing part is $\mx^T\er$, which can be written as:
+\begin{align}
+\mx^T\er &= \mx^T[\vy - \sum_{l'\neq l}\mx (\valpha_{l'} \circ \vmu_{l'})] \\
+&= \mx^T\vy - \mx^T\mx\sum_{l'\neq l}(\valpha_{l'} \circ \vmu_{l'})
+\end{align}
+That is, VEM updates can be computed using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\vy^T\vy$.
+
+\subsection{ELBO computation} \label{sec:elbo_ss}
+This boils down to computing \eqref{eqn:erss} and \eqref{eqn:lkl}. \eqref{eqn:erss} can be computed with VEM updates and $\mx^T\mx$, $\mx^T\vy$, $n$ and $\vy^T\vy$. Bayes factor in \eqref{eqn:lkl} is also given in VEM update; $\er^T\mx$ has been previously computed in Section \ref{sec:vem_update_ss}. It is thus possible to compute ELBO using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\vy^T\vy$.
+
+\subsection{\susie interface with sufficient summary statistics}
+Let $\hat{s}_j = \text{SE}(\hat{b}_j)$. Summary statistics from univariate analysis are given by:
+\begin{align}
+    b_{j} &= \frac{\vx_{j}^{T}\vy}{\vx_{j}^{T}\vx_{j}} \\
+    \hat{s}_{j} &= \frac{\hat{\sigma}_{j}}{\sqrt{\vx_{j}^{T}\vx_{j}}} \\ \label{eqn:shat}
+    \hat{\sigma}_{j}^{2} &= \frac{\norm{\vy - \hat{b}_0 - \vx_{j} \hat{b}_{j}}^2}{n-2} = \frac{RSS}{n-2} \\
+    \hat{t}_{j} &= \frac{\hat{b}_{j}}{\hat{s}_{j}} = \frac{\vx_{j}^{T}\vy}{\hat{\sigma}_{j}\sqrt{\vx_{j}^{T}\vx_{j}}}
+\end{align}
+where $\hat{t}_j$ is the $t$ statistic. Correlation coefficient $R^2$ for the corresponding simple linear regression model is
+\begin{equation}
+    R_{j}^2 = \frac{\hat{t}_{j}^2}{\hat{t}_{j}^2+n-2},
+\end{equation}
+which follows directly from its definition involving the sum of squares due to regression (SSreg) and sum of residual error (RSS), 
+\begin{align}
+    SSreg &= \vy^T \vy - \norm{\vy - \hat{b}_0 - \vx_{j} \hat{b}_{j}}^2 = \vy^T \vy - (\vy^T \vy - \frac{(\vx_{j}^{T}\vy)^2}{\vx_{j}^{T}\vx_{j}}) = \frac{(\vx_{j}^{T}\vy)^2}{\vx_{j}^{T}\vx_{j}}
+\end{align}
+\begin{align}
+    R_{j}^2 &= \frac{SSreg}{SSreg + RSS} = \frac{\frac{(\vx_{j}^{T}\vy)^2}{\vx_{j}^{T}\vx_{j}}}{\frac{(\vx_{j}^{T}\vy)^2}{\vx_{j}^{T}\vx_{j}} + \hat{\sigma}_{j}^{2}(n-2)} \\
+    &= \frac{\hat{t}_{j}^2}{\hat{t}_{j}^2+n-2}.
+\end{align}
+Then we can derive $\hat{\sigma}_{j}^{2}$,
+\begin{equation}
+    1-R_{j}^{2} = \frac{RSS}{SSreg + RSS} = \frac{\hat{\sigma}_{j}^2(n-2)}{\vy^{T}\vy}
+\end{equation}
+\begin{equation}
+    \hat{\sigma}_{j}^2 = \Var(\vy)\frac{(n-1)(1-R_{j}^2)}{n-2} = \Var(\vy) \tilde{\sigma}_{j}^2
+\end{equation}
+where $\tilde{\sigma}_j^2$ is estimated residual variance for standardized $y$. Hence \eqref{eqn:shat} becomes:
+\begin{equation}
+    \hat{s}_{j}^{2} = \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\vx_j^{T}\vx_j}
+\end{equation}
+
+We now work backwards to recovering $\mx^T\mx$ and $\mx^T\vy$:
+\begin{align}
+    \vx_j^{T}\vx_j = \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\hat{s}_{j}^{2}} \\
+    \vx_j^{T}\vy = \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\hat{s}_{j}} \hat{t}_{j}
+\end{align}
+
+Denote $\Lambda = \text{diag}(\sqrt{\vx_1^{T}\vx_1}, \cdots, \sqrt{\vx_p^{T}\vx_p})$, given $\mr = \text{cor}(\mx)$,
+\begin{equation}
+    \mx^T \mx = \Lambda \mr \Lambda
+\end{equation}
+We can now perform \susie computations along the lines of Sections \ref{sec:vem_update_ss} and \ref{sec:elbo_ss}.
+
+\subsection{Variance of y is unknown}
+
+When the variance of $\vy$ is unknown, we set it equal to 1, and $\mx^T \mx = (n-1) R$. Therefore the estimated coefficient is in standardized $X$, $y$ scale.
+
+Define $\tilde{\Sigma} = diag(\tilde{\sigma}_{1}^2, \cdots, \tilde{\sigma}_{p}^2)$, $\hat{\Sigma} = diag(\hat{\sigma}_{1}^2, \cdots, \hat{\sigma}_{p}^2)$
+\begin{equation}
+    var(\vy)\tilde{\Sigma} = \hat{\Sigma}
+\end{equation}
+
+From the definition of $\hat{t}_{j}$, we have
+
+\begin{equation}
+    \mx^{T}\vy = \hat{\Sigma}^{1/2} \sqrt{n-1} \hat{\bm{t}} = \sqrt{var(\vy)} \sqrt{n-1} \tilde{\Sigma}^{1/2} \hat{\bm{t}}
+\end{equation}
+
+\begin{equation}
+    \mx^{T} \frac{1}{\sqrt{var(\vy)}}\vy = \sqrt{n-1} \tilde{\Sigma}^{1/2} \hat{\bm{t}}
+\end{equation}
+
+The \susie model is
+\begin{align}
+\frac{1}{var(\vy)}\vy &= \mx\vb + \ve \\
+\ve & \sim N(0, I_n) \\ 
+\vb &= \sum_{l=1}^L \vb_l\\
+\vb_l & = \vgamma_l b_l \qquad (\text{independently for } l=1,\dots,L)\\
+\vgamma_l & \sim \text{Mult}(1,\vpi) \\
+b_l & \sim N(0,\rv_{0l}).
+\end{align}

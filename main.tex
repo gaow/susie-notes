@@ -19,6 +19,12 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{remark}{Remark}
 
+% widebar
+\DeclareFontFamily{U}{mathx}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathx}{m}{n}{<-> mathx10}{}
+\DeclareSymbolFont{mathx}{U}{mathx}{m}{n}
+\DeclareMathAccent{\widebar}{0}{mathx}{"73}
+
 \usepackage{xspace}
 \newcommand{\susie}{\textsl{SuSiE}\xspace}
 
@@ -81,6 +87,9 @@
 \def\vx{\bm x}
 \def\mx{\bm X}
 \def\vb{\bm b}
+\def\bb{\bar{b}}
+\def\vbb{\bar{\bm{b}}}
+\def\bbb{\bar{b^2}}
 \def\vgamma{\bm \gamma}
 \def\vtheta{\bm \theta}
 \def\vpi{\bm \pi}
@@ -88,6 +97,7 @@
 \def\vq{\bm q}
 \def\vg{\bm g}
 \def\vr{\bm r}
+\def\mr{\bm R}
 \def\rv{\sigma^2} % residual variance
 \def\vrv{\bm \rv}
 \def\vmu{\bm \mu}
@@ -103,6 +113,12 @@
 \def\FSER{F^{\text{SER}}}
 \def\post{p_\text{post}}
 
+\def\emul{\bar{\vmu}_l}
+\def\emulsq{\widebar{\vmu_l^2}}
+\def\emu{\bar{\vmu}}
+\def\emusq{\widebar{\vmu^2}}
+\def\ERSS{\text{ERSS}}
+
 \def\er{\bar{\vr}_l}
 \def\ebl{\E_{q_l}[\vb_l]}
 \def\eb{\sum_l \ebl}
@@ -114,11 +130,11 @@
 \begin{document}
 \singlespacing
 \title{Some notes on SuSiE Derivation}
-\author{Gao Wang}
+\author{Gao Wang and Yuxin Zou}
 \maketitle
 
 \begin{abstract}
-This document fills some technical gaps on the \susie manuscript, mostly algebreic results for \susie VEM updates and ELBO calculation.
+This document fills some technical gaps in \susie manuscript, mostly algebraic results for \susie VEM updates and ELBO calculation.
 \end{abstract}
 
 \section{Notations}
