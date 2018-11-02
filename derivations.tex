@@ -126,7 +126,7 @@ For single effect model,
 \end{equation}
 where
 \begin{align}
-    \E_{q_l}\norm{\vy - \mx\vb_l}^2 &= \norm{\vy - \mx \E_{q_l}[\vb_{l}]}^2 - \E_{q_l}[\vb_{l}]^T\mx^T\mx \E_{q_l}[\vb_{l}] + \sum_i \sum_j \mx_{ij}^2 \E_{q_l}[b_{lj}^2] \\
+    \E_{q_l}\norm{\vy - \mx\vb_l}^2 &= \norm{\vy - \mx \vbb_l}^2 - \vbb_l^T\mx^T\mx \vbb_l + \sum_i \sum_j \mx_{ij}^2 \bbb_{lj} \\
     &= \vy^T\vy -2 \vy^T \mx \vbb_l  + \sum_j (\mx^T \mx)_{jj} \bbb_{lj}
 \end{align}
 where the expectations (first and second moments) are given by (A.37) and (A.38) in the manuscript. 
@@ -198,48 +198,53 @@ Then we can derive $\hat{\sigma}_{j}^{2}$,
     1-R_{j}^{2} = \frac{RSS}{SSreg + RSS} = \frac{\hat{\sigma}_{j}^2(n-2)}{\vy^{T}\vy}
 \end{equation}
 \begin{equation}
-    \hat{\sigma}_{j}^2 = \Var(\vy)\frac{(n-1)(1-R_{j}^2)}{n-2} = \Var(\vy) \tilde{\sigma}_{j}^2
+    \hat{\sigma}_{j}^2 = \Var(\vy)\frac{(n-1)(1-R_{j}^2)}{n-2} = \Var(\vy) \tilde{\sigma}_{j}^2 \label{eqn:sigmahat}
 \end{equation}
-where $\tilde{\sigma}_j^2$ is estimated residual variance for standardized $y$. Hence \eqref{eqn:shat} becomes:
+where $\tilde{\sigma}_j^2$ is estimated residual variance for standardized $\vy$. Hence \eqref{eqn:shat} becomes:
 \begin{equation}
     \hat{s}_{j}^{2} = \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\vx_j^{T}\vx_j}
 \end{equation}
 
-We now work backwards to recovering $\mx^T\mx$ and $\mx^T\vy$:
+We now work backwards to recovering $\mx^T\mx$, $\mx^T\vy$ and $\vy^T\vy$:
 \begin{align}
-    \vx_j^{T}\vx_j = \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\hat{s}_{j}^{2}} \\
-    \vx_j^{T}\vy = \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\hat{s}_{j}} \hat{t}_{j}
+    \vx_j^{T}\vx_j &= \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\hat{s}_{j}^{2}} \\
+    \vx_j^{T}\vy &= \Var(\vy)\frac{\tilde{\sigma}_{j}^2}{\hat{s}_{j}} \hat{t}_{j} \\
+    \vy^T\vy &= \Var(\vy)(n-1).
 \end{align}
-
 Denote $\Lambda = \text{diag}(\sqrt{\vx_1^{T}\vx_1}, \cdots, \sqrt{\vx_p^{T}\vx_p})$, given $\mr = \text{cor}(\mx)$,
 \begin{equation}
-    \mx^T \mx = \Lambda \mr \Lambda
+    \mx^T \mx = \Lambda \mr \Lambda.
 \end{equation}
 We can now perform \susie computations along the lines of Sections \ref{sec:vem_update_ss} and \ref{sec:elbo_ss}.
 
-\subsection{Variance of y is unknown}
+\subsection{\susie interface with univariate testing $z$ scores}
 
-When the variance of $\vy$ is unknown, we set it equal to 1, and $\mx^T \mx = (n-1) R$. Therefore the estimated coefficient is in standardized $X$, $y$ scale.
-
-Define $\tilde{\Sigma} = diag(\tilde{\sigma}_{1}^2, \cdots, \tilde{\sigma}_{p}^2)$, $\hat{\Sigma} = diag(\hat{\sigma}_{1}^2, \cdots, \hat{\sigma}_{p}^2)$
+We start by transforming $z$ scores to $t$ statistics. Let $Q_{t,df}$ denotes the quantile function of t distribution with degree of freedom $df$,
 \begin{equation}
-    var(\vy)\tilde{\Sigma} = \hat{\Sigma}
+    \hat{t}_{j} = -\text{sign}(z_{j}) Q_{t,n-2}(P(Z < -|z_{j}|)).
+\end{equation}
+
+Due to the lack of knowledge of $\Var(\vy)$,  we set it equal to 1, and let $\mx^T \mx = (n-1) \mr$. Therefore the estimated coefficient is in standardized $\mx$, $\vy$ scale.
+
+Define $\tilde{\Sigma} = \text{diag}(\tilde{\sigma}_{1}^2, \cdots, \tilde{\sigma}_{p}^2)$, $\hat{\Sigma} = \text{diag}(\hat{\sigma}_{1}^2, \cdots, \hat{\sigma}_{p}^2)$, \eqref{eqn:sigmahat} becomes
+\begin{equation}
+    \Var(\vy)\tilde{\Sigma} = \hat{\Sigma}
 \end{equation}
 
 From the definition of $\hat{t}_{j}$, we have
 
 \begin{equation}
-    \mx^{T}\vy = \hat{\Sigma}^{1/2} \sqrt{n-1} \hat{\bm{t}} = \sqrt{var(\vy)} \sqrt{n-1} \tilde{\Sigma}^{1/2} \hat{\bm{t}}
+    \mx^{T}\vy = \hat{\Sigma}^{1/2} \sqrt{n-1} \hat{\bm{t}} = \sqrt{\Var(\vy)} \sqrt{n-1} \tilde{\Sigma}^{1/2} \hat{\bm{t}}
 \end{equation}
 
 \begin{equation}
-    \mx^{T} \frac{1}{\sqrt{var(\vy)}}\vy = \sqrt{n-1} \tilde{\Sigma}^{1/2} \hat{\bm{t}}
+    \mx^{T} \frac{1}{\sqrt{\Var(\vy)}}\vy = \sqrt{n-1} \tilde{\Sigma}^{1/2} \hat{\bm{t}}
 \end{equation}
 
-The \susie model is
+The fitted \susie model is
 \begin{align}
-\frac{1}{var(\vy)}\vy &= \mx\vb + \ve \\
-\ve & \sim N(0, I_n) \\ 
+\frac{1}{\sqrt{\Var(\vy)}}\vy &= \mx\vb + \ve \\
+\ve & \sim N(0, \frac{\rv}{\Var(\vy)}I_n) \\ 
 \vb &= \sum_{l=1}^L \vb_l\\
 \vb_l & = \vgamma_l b_l \qquad (\text{independently for } l=1,\dots,L)\\
 \vgamma_l & \sim \text{Mult}(1,\vpi) \\
