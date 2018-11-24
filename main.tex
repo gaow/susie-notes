@@ -1,6 +1,8 @@
 \documentclass[11pt,authoryear]{article}
 \pdfoutput = 1
-\usepackage{fullpage,amsthm,amsmath,amssymb,natbib,algorithm,algorithmic,enumitem,afterpage,amssymb,setspace,graphicx,amsfonts,array,verbatim,commath,mathrsfs,bm}
+\usepackage{fullpage,amsthm,amsmath,amssymb,natbib,enumitem,afterpage,amssymb,setspace,graphicx,amsfonts,array,verbatim,commath,mathrsfs,bm}
+\RequirePackage[noend]{algpseudocode}
+\RequirePackage{algorithm}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows,matrix,positioning, fit, shapes.geometric}
@@ -89,7 +91,7 @@
 \def\vb{\bm b}
 \def\bb{\bar{b}}
 \def\vbb{\bar{\bm{b}}}
-\def\bbb{\bar{b^2}}
+\def\bbb{\widebar{b^2}}
 \def\vgamma{\bm \gamma}
 \def\vtheta{\bm \theta}
 \def\vpi{\bm \pi}
@@ -104,6 +106,7 @@
 \def\vsigma{\bm \sigma}
 \def\valpha{\bm \alpha}
 \def\Var{\text{Var}}
+\def\ry{\hat{\sigma}_y^2}
 
 \def\BF{\text{BF}}
 \def\tr{\text{tr}}
