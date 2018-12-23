@@ -63,9 +63,11 @@ The log Bayes factor is
     &= - \frac{1}{2} \log \rv_0 + \frac{1}{2}\log \rv_1 + \frac{\mu_1^2}{2\rv_1}
 \end{align}
 Thus 
-\begin{equation}
-\BF(\vy, \vx; \rv, \rv_0) = (\rv_0/\rv_1)^{-\frac{1}{2}}\exp(\frac{\mu_1^2}{2\rv_1})
-\end{equation}
+\begin{align}
+\BF(\vy, \vx; \rv, \rv_0) &= (\rv_0/\rv_1)^{-\frac{1}{2}}\exp(\frac{\mu_1^2}{2\rv_1}) \\
+& = \sqrt{\rv_1/\rv_0}\exp{\big(\frac{1}{2}z^2\frac{\rv_1}{\rv/\vx'\vx}\big)} 
+\end{align}
+where $z:=\frac{\hat{b}(\vy, \vx)}{\rv/\sqrt{\vx'\vx}}$.
 
 \subsection{Bayesian single effect multiple regression} \label{sec:bser}
 
@@ -154,8 +156,8 @@ That is, VEM updates can be computed using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\ry$
 \subsection{ELBO computation} \label{sec:elbo_ss}
 This boils down to computing \eqref{eqn:erss} and \eqref{eqn:lkl}. \eqref{eqn:erss} can be computed with VEM updates and $\mx^T\mx$, $\mx^T\vy$, $n$ and $\ry$. Bayes factor in \eqref{eqn:lkl} is also given in VEM update; $\er^T\mx$ has been previously computed in Section \ref{sec:vem_update_ss}. It is thus possible to compute ELBO using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\ry$.
 
-
 \section{\susie with summary statistics}
+
 \subsection{Overview}
 So far we have been working directly with column-centered data $\mx\in \mathbb{R}^{n\times p}$ and $\vy\in\mathbb{R}^{n\times 1}$. In practice, results from genetic association studies are often communicated and shared in terms of ``summary statistics''. Summary-level information in association analysis typically include:
 \begin{enumerate}
@@ -169,6 +171,8 @@ To analyze summary statistics with \susie, we first verify that \susie VEM updat
     \item Sufficient summary statistics: $\hat{b}_j, \text{SE}(\hat{b}_j), \mr, n, \ry$
     \item Univariate testing $z$ scores: $z_j, \mr$
 \end{enumerate}
+
+One crucial difference between the two interfaces is the availability of sample size $n$. If the sample size is not available, we must use the univariate testing $z$ scores, which will loss some power. If the sample size is available, but the sample variance of response is unknown, we can use interface 1, sufficient summary statistics, with $\ry = 1$. The output coefficients are in standardized $\mx$, $\vy$ scale.
 
 \subsection{\susie interface with sufficient summary statistics}
 Let $\hat{s}_j = \text{SE}(\hat{b}_j)$. We assume the univariate analysis fits the model
@@ -188,14 +192,14 @@ In addition to the summary data $(\hat{b}_j, \hat{s}_j)$, we assume that we have
 
 \subsubsection{Method}
 
-The t statistics $\hat{t}_j$ is
-\begin{equation}\label{eqn: ss t}
-     \hat{t}_{j} = \frac{\hat{b}_{j}}{\hat{s}_{j}} = \frac{\vx_{j}^{T}\vy}{\hat{\sigma}_{j}\sqrt{\vx_{j}^{T}\vx_{j}}}
+The z score $\hat{z}_j$ is
+\begin{equation}
+     \hat{z}_{j} = \frac{\hat{b}_{j}}{\hat{s}_{j}} = \frac{\vx_{j}^{T}\vy}{\hat{\sigma}_{j}\sqrt{\vx_{j}^{T}\vx_{j}}}
 \end{equation}
 \begin{proposition} \label{prop:Cor Coeff}
 Correlation coefficient $R^2$ for the corresponding simple linear regression model \eqref{eqn:SLR} is
 \begin{equation}
-    R_{j}^2 = \frac{\hat{t}_{j}^2}{\hat{t}_{j}^2+n-2},
+    R_{j}^2 = \frac{\hat{z}_{j}^2}{\hat{z}_{j}^2+n-2},
 \end{equation}
 \end{proposition}
 
@@ -206,7 +210,7 @@ This follows directly from its definition involving the sum of squares due to re
 \end{align}
 \begin{align}
     R_{j}^2 &= \frac{SSreg_j}{SSreg_j + RSS_j} = \frac{\frac{(\vx_{j}^{T}\vy)^2}{\vx_{j}^{T}\vx_{j}}}{\frac{(\vx_{j}^{T}\vy)^2}{\vx_{j}^{T}\vx_{j}} + \hat{\sigma}_{j}^{2}(n-2)} \\
-    &= \frac{\hat{t}_{j}^2}{\hat{t}_{j}^2+n-2}.
+    &= \frac{\hat{z}_{j}^2}{\hat{z}_{j}^2+n-2}.
 \end{align}
 \end{proof}
 
@@ -223,12 +227,12 @@ Using correlation coefficient $R^2_j$, the estimated residual variance for \eqre
 \end{proof}
 Using Proposition \ref{prop:Cor Coeff} and \ref{prop:resid var}, we have 
 \begin{equation}\label{eqn:residj}
-    \hat{\sigma}_{j}^2 = \ry \frac{n-1}{\hat{t}_{j}^2+n-2}
+    \hat{\sigma}_{j}^2 = \ry \frac{n-1}{\hat{z}_{j}^2+n-2}
 \end{equation}
 We now work backwards to recovering $\mx^T\mx$ and $\mx^T\vy$:
 \begin{align}
     \vx_j^{T}\vx_j &= \frac{\hat{\sigma}_{j}^2}{\hat{s}_{j}^{2}} \label{eqn:xtxjj} \\
-    \vx_j^{T}\vy &= \frac{\hat{\sigma}_{j}^2}{\hat{s}_{j}} \hat{t}_{j} \label{eqn:xty}
+    \vx_j^{T}\vy &= \frac{\hat{\sigma}_{j}^2}{\hat{s}_{j}} \hat{z}_{j} \label{eqn:xty}
 \end{align}
 Denote $\Lambda = \text{diag}(\sqrt{\vx_1^{T}\vx_1}, \cdots, \sqrt{\vx_p^{T}\vx_p})$, given $\mr = \text{cor}(\mx)$,
 \begin{equation}\label{eqn:xtx}
@@ -237,10 +241,10 @@ Denote $\Lambda = \text{diag}(\sqrt{\vx_1^{T}\vx_1}, \cdots, \sqrt{\vx_p^{T}\vx_
 We can now perform \susie computations along the lines of Sections \ref{sec:vem_update_ss} and \ref{sec:elbo_ss}.
 
 \begin{algorithm}[H] 
-\caption{Transfer sufficient summary statistics to $\mx^T \mx$, $\mx^T \vy$ (outline)} \label{alg:ss suff interface}
+\caption{Transform sufficient summary statistics to $\mx^T \mx$, $\mx^T \vy$ (outline)} \label{alg:ss suff interface}
 \begin{algorithmic}[1]
 \Require $\hat{\vb}$, $\hat{\bm{s}}$, $\mr$, $\ry$, n.
-\State Compute $\hat{t}_j := \hat{b}_{j} / \hat{s}_j $
+\State Compute $\hat{z}_j := \hat{b}_{j} / \hat{s}_j $
 \State Compute $\hat{\sigma}_{j}^2$ = \eqref{eqn:residj}
 \State Compute $\vx_j^{T}\vx_j = $ \eqref{eqn:xtxjj}, $\Lambda = \text{diag}(\sqrt{\vx_1^{T}\vx_1}, \cdots, \sqrt{\vx_p^{T}\vx_p})$
 \State $\mx^T \mx = \Lambda \mr \Lambda$
@@ -265,14 +269,14 @@ The likelihood function is
 For each single effect $j$ the posterior inclusion probability is $\alpha_j= \eqref{eqn:ser alpha}$.
 \begin{align}
     \BF(\vy, \vx_j; \rv, \rv_0) &= \sqrt{\frac{\frac{\rv}{\vx_{j}^{T}\vx_j}}{\frac{\rv}{\vx_{j}^{T}\vx_j} + \sigma^2_0}} \exp{\left(\frac{1}{2}\frac{\vx_{j}^{T}\vx_{j} \hat{b}_j^2}{\hat{\sigma}_{j}^2} \frac{\hat{\sigma}_{j}^2}{\rv} \frac{\sigma^2_0}{\frac{\rv}{\vx_{j}^{T}\vx_j} + \sigma^2_0}\right)} \\
-    &= \sqrt{\frac{\frac{\rv}{\vx_{j}^{T}\vx_j}}{\frac{\rv}{\vx_{j}^{T}\vx_j} + \sigma^2_0}} \exp{\left(\frac{1}{2} \hat{t}_{j}^2 \frac{\hat{\sigma}_{j}^2}{\rv} \frac{\sigma^2_0}{\frac{\rv}{\vx_{j}^{T}\vx_j} + \sigma^2_0}\right)} \label{eqn:SERBF}
+    &= \sqrt{\frac{\frac{\rv}{\vx_{j}^{T}\vx_j}}{\frac{\rv}{\vx_{j}^{T}\vx_j} + \sigma^2_0}} \exp{\left(\frac{1}{2} \hat{z}_{j}^2 \frac{\hat{\sigma}_{j}^2}{\rv} \frac{\sigma^2_0}{\frac{\rv}{\vx_{j}^{T}\vx_j} + \sigma^2_0}\right)} \label{eqn:SERBF}
 \end{align}
 The posterior distribution for $b$ is
 \begin{align}
 b_j | \vy, \rv, \rv_0, \gamma_j=1 &\sim N(\mu_{1j},\rv_{1j})
 \intertext{ where }
-\rv_{1j}(\vx_j) & = (\frac{\vx_j^{T}\vx_j}{\rv} + \frac{1}{\sigma^{2}_0})^{-1} = (\frac{\ry(n-1)}{\rv\hat{s}_j^{2}(\hat{t}_j^2+n-2)} + \frac{1}{\sigma^{2}_0})^{-1}\label{eqn:tau1} \\ 
-\mu_{1j}(\vy,\vx_j) & = \frac{\vx_j^{T}\vx_j\sigma_{1j}^2}{\rv} \hat{b}(\vy,\vx_j) = \frac{\ry(n-1)\rv \hat{t}_j}{\ry(n-1) + \frac{\rv}{\sigma^2_0}\hat{s}_j^2(\hat{t}_j^2+n-2)}, \label{eqn:mu1}
+\rv_{1j}(\vx_j) & = (\frac{\vx_j^{T}\vx_j}{\rv} + \frac{1}{\sigma^{2}_0})^{-1} = (\frac{\ry(n-1)}{\rv\hat{s}_j^{2}(\hat{z}_j^2+n-2)} + \frac{1}{\sigma^{2}_0})^{-1}\label{eqn:tau1} \\ 
+\mu_{1j}(\vy,\vx_j) & = \frac{\vx_j^{T}\vx_j\sigma_{1j}^2}{\rv} \hat{b}(\vy,\vx_j) = \frac{\ry(n-1)\rv \hat{z}_j}{\ry(n-1) + \frac{\rv}{\sigma^2_0}\hat{s}_j^2(\hat{z}_j^2+n-2)}, \label{eqn:mu1}
 \end{align}
 The second moment of $b_j | \vy, \rv, \rv_0, \gamma_j=1$ is \begin{equation}\label{eqn:mu12}
     \widebar{\mu^2}_{1j} = \rv_{1j} + \mu_{1j}^2
@@ -328,74 +332,150 @@ The \susie model is a sum of single effect regression. We summarize the algorith
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{\susie using univariate testing $z$ scores}
-The z score is 
-\begin{equation}
-    z_{j}(\sigma_j) = \frac{\frac{1}{\sqrt{n-1}}\vx_j^T \vy}{\sigma_j \sqrt{\frac{1}{n-1}\vx_j^T\vx_j}} \label{eqn:z}
-\end{equation}
-Because the scale of data does not influence the $z$ scores, we assume the columns of $\mx$ and $\vy$ are standardized to unit variance (i.e. $\frac{\vx_j^T\vx_j}{n-1} = 1$, $\frac{\vy^T\vy}{n-1}=1$).
-\subsubsection{Single Effect Regression Algorithm}
-The single effect regression model \eqref{eqn:SER} - \eqref{eqn:SER-b} are equivalent as
-\begin{align} \label{eqn:SERz}
-\frac{1}{\sigma}\vy &= \frac{1}{\sqrt{n-1}}\mx\vb + \ve \\ \label{eqn:SERz-e}
-\ve & \sim N(0,I_n) \\  \label{eqn:SERz-b0}
-\vb & = \vgamma b \\
-\vgamma & \sim \text{Mult}(1,\vpi) \\ \label{eqn:SERz-b}
-b & \sim N(0,(n-1)\rv_0),
-\end{align}
-We use $w$ to denote $(n-1)\rv_0$. For each single effect j, the Bayes Factor is 
+\subsection{\susie using univariate testing $z$ scores} \label{sec:summary z}
+\subsubsection{Bayesian simple linear regression}
+We can rewrite the equations (A.1) - (A.3) as
 \begin{align}
-    \BF(\vy, \vx_j; \rv, w) &= (1 + w)^{-\frac{1}{2}} \exp{\left(\frac{1}{2} z_{j}^2(\sigma) (1+\frac{1}{w})^{-1}\right)} \label{eqn:SERjBF}
+\vy &= \sigma\left( \frac{1}{\sqrt{n-1}} \vx \frac{b\sqrt{n-1}}{\sigma} + \frac { 1}{\sigma} \ve \right) \\
+ &= \sigma\left( \frac{1}{\sqrt{n-1}} \vx \tilde{b} + \tilde{\ve} \right) \label{eqn:BSLRz-y}\\
+\tilde{b} &\sim N(0, \frac{(n-1) \rv_{0}}{\rv}) \\
+\tilde{\ve} & \sim N(0,I_n) \label{eqn:BSLRz-e}
+\end{align}
+Define z score as 
+\begin{equation}
+    z(\sigma) \equiv \frac{\frac{1}{\sqrt{n-1}}\vx^T \frac{1}{\sigma}\vy}{ \sqrt{\frac{1}{n-1}\vx^T\vx}},
+\end{equation}
+which is scale-invariant of $\vx$. For simplicity, we assume $\vx$ is standardized, $\frac{1}{n-1}\vx^T\vx = 1$. The z score can be written as
+\begin{equation}\label{eqn:z}
+    z(\sigma) = \frac{1}{\sqrt{n-1}}\vx^T \frac{1}{\sigma}\vy
+\end{equation}
+Plug in \eqref{eqn:BSLRz-y},
+\begin{align}
+    \eqref{eqn:z} &= \frac{1}{\sqrt{n-1}}\vx^T \left( \frac{1}{\sqrt{n-1}} \vx \tilde{b} + \tilde{\ve} \right) \label{eqn:BSLRz-z}\\
+    &= \tilde{b} + \frac{1}{\sqrt{n-1}}\vx^T\tilde{\ve} \\
+    z(\sigma) &\sim N(\tilde{b}, 1) \quad \text{because of \eqref{eqn:BSLRz-e}} \label{eqn:BSLRz-zdistr}
+\end{align}
+We use $w^2$ to denote $(n-1)\frac{\rv_0}{\rv}$. The posterior distribution for $\tilde{b}$ is
+\begin{align}
+    \tilde{b} | z(\sigma), w &\sim N(\mu_1, \rv_1) \\
+    \rv_1 &= (1 + w^{-2})^{-1} \\
+    \mu_1 &= \rv_1 z(\sigma)
+\end{align}
+The Bayes Factor is 
+\begin{align}
+    \BF(z(\sigma); w) &=  \frac{p(z(\sigma) | \tilde{b} \neq 0)}{p(z(\sigma) | \tilde{b} = 0)}\label{eqn:BSLRz-BF} \\
+    &= \frac{N(z(\sigma); 0, 1+w^2)}{N(z(\sigma); 0, 1)} \\
+    &= \sqrt{\frac{1}{1+w^2}} \exp\left( \frac{1}{2} z(\sigma)^2 \frac{w^2}{1+w^2} \right)
 \end{align}
 In practice, $\rv$ is not known, \cite{wen2014bayesian} shows the Bayes Factor for any $\rv$ can be approximated by Laplace's method.
 \begin{equation}
-    \BF(\vy, \vx_j; \rv, w) =  \BF(\vy, \vx_j; \hat{\rv}_j, w)\left[1+o(\frac{1}{n})\right]
+    \BF(z(\sigma); w) =  \BF(z(\hat{\sigma}); w) \left[1+o(\frac{1}{n})\right]
 \end{equation}
-where $\hat{\rv}_j$ is the MLE of $\rv$ estimated from the simple linear regression model testing the association of SNP j.
+where $\hat{\rv}$ is the MLE of $\rv$ estimated from the simple linear regression model testing the association of $\vx$. We also use $\hat{\rv}$ in the posterior mean. Note that $z(\hat{\sigma})$ is the z scores from simple linear regression.
 
-The posterior distribution for b is
+\subsubsection{Single Effect Regression}
+The single effect regression model is
 \begin{align}
-b_j | \vy, \rv, w, \gamma_j=1 &\sim N(\mu_{1j},\rv_{1j})
-\intertext{ where }
-\rv_{1j} & = (1 + \frac{1}{w})^{-1}\label{eqn:SERztau1} \\ 
-\mu_{1j} & = (1 + \frac{1}{w})^{-1} \frac{1}{\sqrt{n-1}}\vx_j^T \frac{1}{\sigma}\vy = (1 + \frac{1}{w})^{-1}z_{j}(\sigma) \\
-&\approx (1 + \frac{1}{w})^{-1}z_{j}(\hat{\sigma}_j), \label{eqn:SERzmu1}
+\vy &= \sigma\left( \frac{1}{\sqrt{n-1}} \mx \frac{\vb\sqrt{n-1}}{\sigma} + \frac {1}{\sigma} \ve \right) \\
+ &= \sigma\left( \frac{1}{\sqrt{n-1}} \mx \tilde{\vb} + \tilde{\ve} \right) \label{eqn:SERz-y}\\
+\tilde{\vb} &= \tilde{b} \vgamma \\
+\vgamma &\sim Mult(1, \vpi) \\
+\tilde{b} &\sim N(0, w^2) \\
+\tilde{\ve} & \sim N(0,I_n) \label{eqn:SERz-e}
 \end{align}
-The approximation in \eqref{eqn:SERzmu1} gives conservative estimates of $\mu_{1j}$. 
-
-The second moment of $b_j | \vy, \rv_j, w, \gamma_j=1$ is \begin{equation}\label{eqn:SERzmu12}
-    \widebar{\mu^2}_{1j} = \rv_{1j} + \mu_{1j}^2
+We assume that $\mx$ is column standardized. The z score for each SNP j is
+\begin{equation}\label{eqn:zj}
+    z_j(\sigma) = \frac{1}{\sqrt{n-1}}\vx_j^T \frac{1}{\sigma}\vy
 \end{equation}
-The posterior on the indicator vector $\vgamma$ is
-\begin{align}
-    \vgamma|\vy, \rv_j, w &\sim \text{Mult}(1,\valpha) \\
-    \valpha_{j} &= \BF(\vy, \vx_j) \pi_j/\sum_k \BF(\vy, \vx_k) \pi_k \label{eqn:SERz-pip}
+Similar as \eqref{eqn:BSLRz-z} - \eqref{eqn:BSLRz-zdistr}, we have
+\begin{equation} \label{eqn:serz}
+    \bm{z}(\sigma) \sim N(\mr \tilde{\vb}, \mr)
+\end{equation}
+where $\mr$ is the sample correlation matrix (LD matrix). The posterior distribution for $\tilde{\vb}$ is
+\begin{align} \label{eqn:serz-postgamma}
+    \vgamma | \bm{z}(\sigma), w &\sim Mult(1, \valpha) \\
+    \alpha_j &= \BF(z_j(\sigma); w) \pi_j/\sum_k \BF(z_k(\sigma); w) \pi_k \label{eqn:serz-postalpha}\\
+    \tilde{b} | z(\sigma), w, \vgamma_j = 1 &\sim N(\mu_{1j}, \rv_{1j}) \label{eqn:serz-postb}\\
+    \rv_{1j} &= (1 + w^{-2})^{-1} \label{eqn:serz-postsigma}\\
+    \mu_{1j} &= \rv_{1j} z_j(\sigma) \label{eqn:serz-postmu}
 \end{align}
-Let $\hat{q}(\vb)$ be the posterior distribution of $\vb$, the ELBO is
+For each SNP j, the Bayes Factor is
+\begin{align} \label{eqn:SERzBFj}
+    BF(z_j(\sigma); w) &= \sqrt{\frac{1}{1+w^2}} \exp\left( \frac{1}{2} z_j(\sigma)^2 \frac{w^2}{1+w^2} \right)
+\end{align}
+The first moment and the second moment of $\tilde{b}_j$ is 
 \begin{align}
-    F(\hat{\q},\g;\rv, \vy) &= -\frac{n}{2} \log(2\pi) - \frac{1}{2}(\frac{1}{\rv}(n-1) - 2 \frac{1}{\sigma}\vy^T\frac{1}{\sqrt{n-1}}\mx \bar{\vb} + \sum_j \bbb_{j}) + \E_{\hat{q}}\left[\log\frac{g(\vb)}{\hat{q}(\vb)} \right] \\
-    &= \frac{1}{\sigma}\vy^T\frac{1}{\sqrt{n-1}}\mx \bar{\vb} - \frac{1}{2} \sum_j \bbb_{j} + \E_{\hat{q}}\left[\log\frac{g(\vb)}{\hat{q}(\vb)}\right] + C\label{eqn:SERzelbo}
+    \bb_j &= \mathbb{E}(\tilde{b}_j|w) = \alpha_j \mu_{1j} \label{eqn:serz 1st}\\
+    \bbb_j &= \mathbb{E}(\tilde{b}_j^2|w) = \alpha_j (\rv_{1j} + \mu_{1j}^2) = \alpha_j \widebar{\mu^2}_{1j} \label{eqn:serz 2nd}
+\end{align}
+Let $\hat{q}(\tilde{\vb})$ be the posterior distribution of $\vb$, the ELBO is
+\begin{align}
+    F(\hat{\q},\g;\bm{z}) &= -\frac{n}{2} \log(2\pi) - \frac{1}{2}(\frac{1}{\rv}\vy^T\vy - 2 \frac{1}{\sigma}\vy^T\frac{1}{\sqrt{n-1}}\mx \bar{\vb} + \sum_j \bbb_{j}) + \E_{\hat{q}}\left[\log\frac{g(\tilde{\vb})}{\hat{q}(\tilde{\vb})} \right] \\
+    &= \bm{z}(\sigma)^{T} \bar{\vb} - \frac{1}{2} \sum_j \bbb_{j} + \E_{\hat{q}}\left[\log\frac{g(\tilde{\vb})}{\hat{q}(\tilde{\vb})}\right] + C\label{eqn:SERzelbo}
 \end{align}
 where $C$ is a constant.
+
+Similar as in Bayesian simple linear regression, we use $\hat{\rv}_j$, which is the MLE of $\rv_j$ estimated from the simple linear regression model testing the association of SNP j, to approximate the Bayes Factor and the posterior distribution. The estimates $z_j(\hat{\sigma}_j)$ is the z score from the simple linear regression model for each SNP j.
 
 \begin{algorithm}[H] 
 \caption{SER using $z$ scores} \label{alg:SERzalg}
 \begin{algorithmic}[1]
 \Require $\bm{z}$, $\mr$
-\Repeat
-\State $\hat{w} \gets \arg \max \sum_{j=1}^{p} \pi_j BF(\vy, \vx_j; w)$ \Comment{EB update of $w$} 
-\State $\alpha_j, \mu_{j1}, \widebar{\mu^2}_{1j} \gets $ \eqref{eqn:SERz-pip} \eqref{eqn:SERzmu1} \eqref{eqn:SERzmu12} \Comment{update posterior}
-\State $\bb_j$, $\bbb_j$ $\gets$ \eqref{eqn:ser 1st}, \eqref{eqn:ser 2nd} \Comment{update posterior}
-\State Update ELBO \eqref{eqn:SERzelbo}
-\Until{converged} \\
-\Return $\hat{w}_0$, $\vmu$, $\emusq$, $\valpha$
+\State $\hat{w} \gets \arg \max \sum_{j=1}^{p} \pi_j BF(z_j(\hat{\sigma}_j); w)$ \Comment{EB update of $w$} 
+\State $\alpha_j, \mu_{1j}, \widebar{\mu^2}_{1j} \gets $ \eqref{eqn:serz-postalpha} - \eqref{eqn:serz-postmu} \Comment{update posterior} \\
+\Return $\hat{w}$, $\vmu$, $\emusq$, $\valpha$
 \end{algorithmic}
 \end{algorithm}
+
+\textbf{Connection with RSS:}
+
+We derived the Bayes Factor \eqref{eqn:SERzBFj} using the RSS likelihood \citep{zhu2017bayesian}. The RSS likelihood assumes the correlation of $\vy$ with any single covariate $\vx_j$ is small. Let $\hat{\vb} = (\hat{b}_1, \cdots, \hat{b}_p)^T$, $\hmd = diag(\hvd)$, $\hvd = (\hat{d}_1, \cdots, \hat{d}_p)^T$, 
+\begin{equation}
+    \hat{d}_j^2 = \hat{s}_j^2 + \frac{1}{n} \hat{b}_j^2 \approx \hat{s}_j^2 \text{ when n is large}
+\end{equation}
+\cite{zhu2017bayesian} show the likelihood for $\vb$ is
+\begin{equation}
+    L_{RSS}(\vb; \hat{\vb}, \hmd, \mr) = N(\hat{\vb}; \hmd \mr \hmd^{-1}\vb, \hmd \mr \hmd)
+\end{equation}
+Let $\vz = \hmd^{-1}\vb$, $\hvz = \hmd^{-1}\hat{\vb}$, then
+\begin{equation}
+    \hvz | \vz, \mr \sim N(\mr \vz, \mr)
+\end{equation}
+which is very similar as \eqref{eqn:serz}.
+\begin{equation}
+    \left(\begin{array}{c}
+        \hat{\vz}_{-j}  \\
+        \hat{z}_j 
+    \end{array}\right) | \vz, \mr \sim N\left(\left(\begin{array}{c}
+        (\mr\vz)_{-j}  \\
+        (\mr\vz)_{j}
+    \end{array}\right), \left(\begin{array}{cc}
+        \mr_{-jj} & (\mr_{j})_{-j} \\
+        (\mr_{j})_{-j}^{T} & 1
+    \end{array} \right) \right)
+\end{equation}
+where $\mr_{-jj}$ is the $\mr$ matrix without the $j$th row and column. $(\mr_{j})_{-j}$ is the $j$th column of $\mr$ without the $j$th element. Using conditional probability, we have
+\begin{align}
+    p(\hvz|z_j=0, \vz = 0) &= p(\hat{z}_j | z_j=0, \vz = 0) p(\hat{\vz}_{-j}| \hat{z}_j,  z_j=0, \vz = 0) \\
+    &= N(\hat{z}_j; 0,1)N(\hat{\vz}_{-j}; (\mr_{j})_{-j} \hat{z}_j, \mr_{-jj} - (\mr_{j})_{-j} (\mr_{j})_{-j}^{T})
+\end{align}
+\begin{align}
+    p(\hvz|z_j\neq0, \vz_{-j} = 0) &= p(\hat{z}_j | z_j\neq0, \vz_{-j} = 0) p(\hat{\vz}_{-j}| \hat{z}_j,  z_j\neq0, \vz_{-j} = 0) \\
+    &= N(\hat{z}_j; z_j,1)N(\hat{\vz}_{-j}; (\mr_{j})_{-j} \hat{z}_j, \mr_{-jj} - (\mr_{j})_{-j} (\mr_{j})_{-j}^{T})
+\end{align}
+The Bayes Factor is 
+\begin{align}
+    BF &= \frac{\int p(\hvz|z_j\neq0, \vz_{-j} = 0)p(z_j) d z_j }{p(\hvz|z_j=0, \vz = 0)} \\
+    &= \frac{\int N(\hat{z}_j; z_j,1)N(z_j;0,w)d z_j}{N(\hat{z}_j; 0,1)} \\
+    &= \frac{N(\hat{z}_j; 0,1+w^2)}{N(\hat{z}_j; 0,1)} \\
+    &= \sqrt{\frac{1}{1+w^2}} \exp{\left[ \frac{1}{2} \hat{z}_j^2 (1+\frac{1}{w^2})^{-1} \right]}
+\end{align}
+which is same as \eqref{eqn:SERzBFj} with $z_j(\hat{\sigma}_j)$.
 
 \subsubsection{\susie algorithm}
 The \susie model is a sum of single effect regression. The ELBO at optimum $\q$ is
 \begin{align}
-    F(\hat{\q},\g;\rv, \vy) &= \frac{1}{\sigma}\vy^T\frac{1}{\sqrt{n-1}}\mx \bar{\vb} - \frac{1}{2}\bar{\vb}^T \mr \bar{\vb} + \frac{1}{2} \sum_l \bar{\vb}_l^T \mr \bar{\vb}_l - \frac{1}{2} \sum_l \sum_j \bar{b^2}_{lj} + \sum_l \E_{\hat{q}_l}\left[\log\frac{g_l(\vmu_l)}{\hat{q}_l(\vmu_l)} \right] \label{eqn:Fzexplicit}
+    F(\hat{\q},\g;\bm{z}(\sigma)) &= \bm{z}(\sigma)^{T} \bar{\vb} - \frac{1}{2}\bar{\vb}^T \mr \bar{\vb} + \frac{1}{2} \sum_l \bar{\vb}_l^T \mr \bar{\vb}_l - \frac{1}{2} \sum_l \sum_j \bar{b^2}_{lj} + \sum_l \E_{\hat{q}_l}\left[\log\frac{g_l(\vmu_l)}{\hat{q}_l(\vmu_l)} \right] \label{eqn:Fzexplicit}
 \end{align}
 We summarize the algorithm here:
 \begin{algorithm}[H] 
@@ -415,4 +495,4 @@ We summarize the algorithm here:
 \Return $\hat{\bm{w}}$, $\vmu_{L\times p}$, $\emusq_{L\times p}$, $\valpha_{L\times p}$
 \end{algorithmic}
 \end{algorithm}
-
+Note that when the data contain multiple strong association signals ($\hat{\sigma}_j > \sigma$), the z score approximation over-estimates residual error, therefore under-estimates the Bayes Factor. The over-estimation of noise can lead to reduce power.
