@@ -20,7 +20,7 @@ This section derives equations (A.29) -- (A.36) in the manuscript.
 
 \subsection{Bayesian univariate regression} \label{sec:bur}
 
-This corresponds to equations (2.4) -- (2.11) in the manuscript. Here I show results for (2.7) -- (2.11). By Bayes rule,
+This corresponds to equations (A.4) -- (A.8) in the manuscript. By Bayes rule,
 \begin{equation}
     \post(b|\vy, \rv, \rv_0) = \frac{p(\vy|\rv,b)p(b|\rv_0)}{p(\vy|\rv, \rv_0)}
 \end{equation}
@@ -71,18 +71,18 @@ where $z:=\frac{\hat{b}(\vy, \vx)}{\rv/\sqrt{\vx'\vx}}$.
 
 \subsection{Bayesian single effect multiple regression} \label{sec:bser}
 
-This section deals with model (2.12) -- (2.21) in the manuscript. Here we derive equation (2.18). For each single effect $j$ the posterior inclusion probability is
+Here we derive equation (A.11). For each single effect $j$ the posterior inclusion probability is
 \begin{align}
     \valpha_j &= p(\gamma_j = 1 | \vy, \rv, \rv_0) \\
     &= \frac{p(\vy | \gamma_j = 1, \rv, \rv_0)p(\gamma_j=1)}{\sum_j p(\vy | \gamma_j = 1, \rv, \rv_0)p(\gamma_j=1)} \\
     &= \pi_j \frac{p(\vy | \gamma_j = 1, \rv, \rv_0) / p(\vy|\rv)}{\sum_j \pi_j p(\vy | \gamma_j = 1, \rv, \rv_0) / p(\vy | \rv)} \\
     &= \pi_j \frac{\BF(\vy, \vx_j; \rv, \rv_0)}{\sum_j \pi_j \BF(\vy, \vx_j; \rv, \rv_0)} \label{eqn:ser alpha}
 \end{align}
-Derivations of single effect Bayes factors and posteriors follow directly from Section \ref{sec:bur}. We have now completed derivation of equations (A.29) -- (A.36) of the manuscript, the core updates of the \susie VEM algorithm.
+Derivations of single effect Bayes factors and posteriors follow directly from Section \ref{sec:bur}. We have now completed derivation of equations (A.11) -- (A.13) of the manuscript, the core updates of the \susie VEM algorithm.
 
 \section{ELBO updates}
 
-This section shows derivation of equation (A.19) for \susie model. It involves the ERSS in (A.19), the conditional likelihood in (A.40) and the marginal likelihood in (A.46) for Bayesian single effect model in Section \ref{sec:bser}: 
+This section shows derivation of equation (B.19) for \susie model. It involves the ERSS in (B.22) and the marginal likelihood in (B.17) for Bayesian single effect model in Section \ref{sec:bser}: 
 
 \begin{align}
     F(\q,\g,\rv; \vy) &= -\frac{n}{2} \log(2\pi\rv) -\frac{1}{2\rv}\E_{\q}\norm{\vy-\sum_l \vmu_l}^2 + \sum_l \E_{q_l}\left[\log\frac{g_l(\vmu_l)}{q_l(\vmu_l)} \right] \label{eqn:Fexplicit}\\
@@ -91,11 +91,9 @@ This section shows derivation of equation (A.19) for \susie model. It involves t
 
 \subsection{ERSS}
 
-Analytic form of ERSS for \susie model can be obtained by putting together (A.22), (A.24), (A.26), (A.37) and (A.38). (A.22) is derived in (A.48) -- (A.50).
-
-Specifically, for \susie model $\vmu_l = \mx \vb_l$. Let $\bb_{l_j} = \E_{q_l}[b_{l_j}]$, $\bbb_{l_j} = \E_{q_l}[b^2_{l_j}]$, and $\vbb = \sum_l \vbb_{l}$. The expectations are given by (A.37) and (A.38) in the manuscript. ERSS in (A.50) can be written as:
+For \susie model $\vmu_l = \mx \vb_l$. Let $\bb_{l_j} = \E_{q_l}[b_{l_j}]$, $\bbb_{l_j} = \E_{q_l}[b^2_{l_j}]$, and $\vbb = \sum_l \vbb_{l}$. The expectations are given by (A.14) and (A.15) in the manuscript. ERSS in (B.22) can be written as:
 \begin{align}
-    \text{(A.50)} &= \ERSS(\vy,\emu,\emusq) = \norm{\vy-\sum_l \emul}^2 - \sum_l \bar{\vmu_l}^T \bar{\vmu_l} + \sum_l \sum_i \E_{q_l}[(\mu_{l_i})^2] \\
+    \text{(B.22)} &= \ERSS(\vy,\emu,\emusq) = \norm{\vy-\sum_l \emul}^2 - \sum_l \bar{\vmu_l}^T \bar{\vmu_l} + \sum_l \sum_i \E_{q_l}[(\mu_{l_i})^2] \\
     &= \norm{\vy-\sum_l \mx \vbb_l}^2 - \sum_l (\mx \vbb_l)^T (\mx \vbb_l) + \sum_l \sum_i \sum_{j} \mx_{ij}^{2}  \bbb_{lj} \\
     &= \vy^T\vy - 2 \vy^T (\sum_l \mx \vbb_l) + (\sum_l \mx \vbb_l)^T(\sum_l \mx \vbb_l) - \sum_l (\mx \vbb_l)^T (\mx \vbb_l) + \sum_l \sum_i \sum_{j} \mx_{ij}^{2}  \bbb_{lj} \\
     &= \vy^T\vy - 2 \vy^T\mx \bar{\vb} + \bar{\vb}^T \mx^T\mx \bar{\vb} - \sum_l \bar{\vb}_l^T \mx^T \mx \bar{\vb}_l + \sum_l \sum_j (\mx^T \mx)_{jj} \bbb_{lj} \label{eqn:erss}
@@ -127,8 +125,8 @@ where
 \end{align}
 
 \subsection{Compute ELBO}
-Now we are ready to compute ELBO (A.19).
-Replacing $\vy$ by $\er$ in \eqref{eqn:lmarginal} and \eqref{eqn:lconditional}, we derive (A.46) in the manuscript:
+Now we are ready to compute ELBO (B.19).
+Replacing $\vy$ by $\er$ in \eqref{eqn:lmarginal} and \eqref{eqn:lconditional}, we derive (B.34) in the manuscript:
 \begin{align}
     \E_{\hat{q}_l} \left[ \log \frac{g_l(\vmu_l)}{\hat{q}_l(\vmu_l)} \right] &= \log L_l(\er; g_l,\rv) - \E_{q_l}[\log p(\er|\vmu_l,\rv)]  \\
     &= \log N(\er; 0, \rv I_n) + \log \sum_j \pi_j \BF(\er, \vx_j; \rv, \rv_0) + \frac{n}{2} \log(2\pi\rv) +\frac{1}{2\rv}\E_{\hat{q}_l}\norm{\er-\vmu_l}^2 \\
@@ -371,7 +369,7 @@ In practice, $\rv$ is not known, \cite{wen2014bayesian} shows the Bayes Factor f
 \begin{equation}
     \BF(z(\sigma); w) =  \BF(z(\hat{\sigma}); w) \left[1+o(\frac{1}{n})\right]
 \end{equation}
-where $\hat{\rv}$ is the MLE of $\rv$ estimated from the simple linear regression model testing the association of $\vx$. We also use $\hat{\rv}$ in the posterior mean. Note that $z(\hat{\sigma})$ is the z scores from simple linear regression.
+where $\hat{\rv}$ is the MLE of $\rv$ estimated from the simple linear regression model testing the association of $\vx$. We also use $\hat{\rv}$ in the posterior mean. Note that $z(\hat{\sigma})$ is the z score from simple linear regression.
 
 \subsubsection{Single Effect Regression}
 The single effect regression model is
@@ -479,7 +477,7 @@ The \susie model is a sum of single effect regression. The ELBO at optimum $\q$ 
 \end{align}
 We summarize the algorithm here:
 \begin{algorithm}[H] 
-\caption{\susie using sufficient summary statistics (outline)} \label{alg:susiezalg}
+\caption{\susie using univariate testing $z$ scores (outline)} \label{alg:susiezalg}
 \begin{algorithmic}[1]
 \Require $\bm{z}$, $\mr$.
 \Repeat
