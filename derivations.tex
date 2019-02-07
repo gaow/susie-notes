@@ -137,14 +137,14 @@ Replacing $\vy$ by $\er$ in \eqref{eqn:lmarginal} and \eqref{eqn:lconditional}, 
 The ELBO at $\q = \hat{\q}_{optim}$ is then given by $F(\hat{\q},\g,\rv; \vy) = -\frac{n}{2} \log(2\pi\rv) - \frac{1}{2\rv} \eqref{eqn:erss} + \sum_l \eqref{eqn:lkl}$.
 
 \section{Update residual variance}
-This is a crucial step but is trivial to derive for univariate case ($\vy$ is a vector). It is given by Equation (A.23) in the manuscript. Specifically for \susie model, $\hat{\rv} = \eqref{eqn:erss}/n$.
+This is a crucial step but is trivial to derive for univariate case ($\vy$ is a vector). It is given by Equation (B.23) in the manuscript. Specifically for \susie model, $\hat{\rv} = \eqref{eqn:erss}/n$.
 
 \section{Sufficient statistics for \susie}
 
 The sufficient statistics required to fit \susie model are ($\mx^T\mx$, $\mx^T\vy$, $n$ and $\ry$).
 
 \subsection{VEM updates} \label{sec:vem_update_ss}
-Using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\ry$ as input, results for (2.7) -- (2.11), (2.18) in the manuscript still hold. For (A.29) -- (A.36) the only missing part is $\mx^T\er$, which can be written as:
+Using $\mx^T\mx$, $\mx^T\vy$, $n$ and $\ry$ as input, results for (A.9) -- (A.15) in the manuscript still hold. For (B.27) the only missing part is $\mx^T\er$, which can be written as:
 \begin{align}
 \mx^T\er &= \mx^T[\vy - \sum_{l\neq l}\mx (\valpha_{l'} \circ \vmu_{l'})] \\
 &= \mx^T\vy - \mx^T\mx\sum_{l'\neq l}(\valpha_{l'} \circ \vmu_{l'})
