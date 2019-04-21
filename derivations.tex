@@ -284,14 +284,6 @@ The first moment and the second moment of $b_j$ is
     \bb_j &= \mathbb{E}(b_j|\rv, \rv_0) = \alpha_j \mu_{1j} \label{eqn:ser 1st}\\
     \bbb_j &= \mathbb{E}(b_j^2|\rv, \rv_0) = \alpha_j (\rv_{1j} + \mu_{1j}^2) = \alpha_j \widebar{\mu^2}_{1j} \label{eqn:ser 2nd}
 \end{align}
-Let $\hat{q}(\vb)$ be the posterior distribution of $\vb$, the ELBO is
-\begin{align}
-    F(\hat{\q},\g,\rv; \vy) &= -\frac{n}{2} \log(2\pi\rv) - \frac{1}{2\rv}(\ry (n-1) - 2 \vy^T\mx \bar{\vb} + \sum_j (\mx^T \mx)_{jj} \bar{b^2}_{j}) + \E_{\hat{q}}\left[\log\frac{g(\vb)}{\hat{q}(\vb)} \right] \label{eqn:ser elbo}
-\end{align}
-Maximizing \eqref{eqn:ser elbo} over $\rv$, we have
-\begin{equation}\label{eqn:ser resid}
-    \hat{\rv} = \frac{\ry (n-1) - 2 \vy^T\mx \bar{\vb} + \sum_j (\mx^T \mx)_{jj} \bbb_{j}}{n}
-\end{equation}
 
 \begin{algorithm}[H] 
 \caption{SER using sufficient statistics (outline)} \label{alg:SERalg}
@@ -301,8 +293,8 @@ Maximizing \eqref{eqn:ser elbo} over $\rv$, we have
 \State $\hat{\rv}_0 \gets \arg \max$ \eqref{eqn:ser L} \Comment{EB update of $\rv_0$ (optional; omitted if $\rv_0$ fixed)} 
 \State $\alpha_j, \mu_{j1}, \widebar{\mu^2}_{1j} \gets $ \eqref{eqn:ser alpha} \eqref{eqn:mu1} \eqref{eqn:mu12} \Comment{update posterior}
 \State $\bb_j$, $\bbb_j$ $\gets$ \eqref{eqn:ser 1st}, \eqref{eqn:ser 2nd} \Comment{update posterior}
-\State $\hat{\rv} \gets $ \eqref{eqn:ser resid} \Comment{update $\rv$ (optional; omitted if $\rv_0$ fixed)}
-\State Update ELBO \eqref{eqn:ser elbo}
+\State $\hat{\rv} \gets$ \eqref{eqn:erss}/n \Comment{update $\rv$ (optional; omitted if $\rv_0$ fixed)}
+\State Update ELBO \eqref{eqn:Fexplicit}
 \Until{converged} \\
 \Return $\hat{\rv}_0$, $\vmu$, $\emusq$, $\valpha$, $\hat{\rv}$
 \end{algorithmic}
