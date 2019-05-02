@@ -1,0 +1,135 @@
+\pdfoutput = 1
+\usepackage{fullpage,amsthm,amsmath,amssymb,natbib,enumitem,afterpage,amssymb,setspace,graphicx,amsfonts,array,verbatim,commath,mathrsfs,bm}
+\RequirePackage[noend]{algpseudocode}
+\RequirePackage{algorithm}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows,matrix,positioning, fit, shapes.geometric}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage[colorlinks=TRUE,citecolor=Blue,linkcolor=BrickRed,urlcolor=PineGreen]{hyperref}
+
+\usepackage{mathtools}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\numberwithin{equation}{section}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+% widebar
+\DeclareFontFamily{U}{mathx}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathx}{m}{n}{<-> mathx10}{}
+\DeclareSymbolFont{mathx}{U}{mathx}{m}{n}
+\DeclareMathAccent{\widebar}{0}{mathx}{"73}
+
+\usepackage{xspace}
+\newcommand{\susie}{\textsl{SuSiE}\xspace}
+
+\def\bx{\bm x}
+\def\btheta{\bm \theta}
+\def\be{\bm e}
+\def\bs{\bm s}
+\def\U{\mathcal U}
+\def\SU{\mathcal SU}
+\def\SN{\mathcal SN}
+\def\G{\mathcal{G}}
+\def\Q{\mathcal{Q}}
+\def\L{\mathcal{L}}
+\def\C{\mathcal{C}}
+\def\iid{\sim^\text{\it iid}}
+
+\def\glhat{\hat{g}_{\l}}
+\def\gfhat{\hat{g}_{\f}}
+\def\l{\bm l}
+\def\f{\bm f}
+\def\h{\bm h}
+\def\p{p}
+\def\ash{{\it ash}}
+\def\flash{{\it flash}}
+\def\ERsq{\widebar{R^2}}
+\def\precij{\prec_{ij}}
+\def\E{\text{E}}
+\def\PIP{\text{PIP}}
+
+\def\Ef{\text{E}_{\qf}(f_j)}
+\def\Efsq{\text{E}_{\qf}(f^2_j)}
+\def\Efk{\text{E}_{\qf}f_{kj}}
+\def\Efksq{\text{E}_{\qf}(f^2_{kj})}
+\def\Efkdash{\text{E}_{\qf}f_{k'j}}
+
+\def\El{\text{E}_{\ql}(l_i)}
+\def\Elsq{\text{E}_{\ql}(l^2_i)}
+\def\Elk{\text{E}_{\ql}l_{ki}}
+\def\Elksq{\text{E}_{\ql}(l^2_{ki})}
+\def\Elkdash{\text{E}_{\ql}l_{k'i}}
+\def\gfk{g_{\f_k}}
+\def\glk{g_{\l_k}}
+\def\ghk{g_{\h_k}}
+
+\def\pve{\phi}
+
+
+\def\ebnm{\text{\it EBNM}}
+\def\ser{\text{\it SER}}
+\def\prec{\bm \prec}
+\def\T{\mathcal T}
+\def\iter{t}
+
+\def\Q{\mathcal Q}
+\def\G{\mathcal G}
+\def\g{\bm g}
+\def\q{{\bm q}}
+\def\vmu{\bm \mu}
+\def\vy{\bm y}
+\def\vx{\bm x}
+\def\mx{\bm X}
+\def\vb{\bm b}
+\def\bb{\bar{b}}
+\def\vbb{\bar{\bm{b}}}
+\def\bbb{\widebar{b^2}}
+\def\md{\bm D}
+\def\hmd{\hat \md}
+\def\vd{\bm d}
+\def\hvd{\hat \vd}
+\def\vz{\bm z}
+\def\hvz{\hat \vz}
+\def\vgamma{\bm \gamma}
+\def\vtheta{\bm \theta}
+\def\vpi{\bm \pi}
+\def\ve{\bm e}
+\def\vq{\bm q}
+\def\vg{\bm g}
+\def\vr{\bm r}
+\def\mr{\bm R}
+\def\rv{\sigma^2} % residual variance
+\def\vrv{\bm \rv}
+\def\vmu{\bm \mu}
+\def\vsigma{\bm \sigma}
+\def\valpha{\bm \alpha}
+\def\Var{\text{Var}}
+\def\ry{\hat{\sigma}_y^2}
+
+\def\BF{\text{BF}}
+\def\tr{\text{tr}}
+\def\DKL{D_\text{KL}}
+\def\SEN{\text{\it SEN}}
+\def\SER{\text{SER}}
+\def\FSER{F^{\text{SER}}}
+\def\post{p_\text{post}}
+
+\def\emul{\bar{\vmu}_l}
+\def\emulsq{\widebar{\vmu_l^2}}
+\def\emu{\bar{\vmu}}
+\def\emusq{\widebar{\vmu^2}}
+\def\ERSS{\text{ERSS}}
+
+\def\er{\bar{\vr}_l}
+\def\ebl{\E_{q_l}[\vb_l]}
+\def\eb{\sum_l \ebl}
+
+\def\ie{i.e.\,}
+\def\eg{e.g.\,}
