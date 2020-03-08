@@ -67,7 +67,7 @@ Thus
 \BF(\vy, \vx; \rv, \rv_0) &= (\rv_0/\rv_1)^{-\frac{1}{2}}\exp(\frac{\mu_1^2}{2\rv_1}) \\
 & = \sqrt{\rv_1/\rv_0}\exp{\big(\frac{1}{2}z^2\frac{\rv_1}{\rv/\vx'\vx}\big)} 
 \end{align}
-where $z:=\frac{\hat{b}(\vy, \vx)}{\rv/\sqrt{\vx'\vx}}$.
+where $z:=\frac{\hat{b}(\vy, \vx)}{\sqrt{\rv/\vx'\vx}}$.
 
 \subsection{Bayesian single effect multiple regression} \label{sec:bser}
 
@@ -138,6 +138,16 @@ The ELBO at $\q = \hat{\q}_{optim}$ is then given by $F(\hat{\q},\g,\rv; \vy) = 
 
 \section{Update residual variance}
 This is a crucial step but is trivial to derive for univariate case ($\vy$ is a vector). It is given by Equation (B.23) in the manuscript. Specifically for \susie model, $\hat{\rv} = \eqref{eqn:erss}/n$.
+
+\section{Update prior variance using EM algorithm}
+
+In the manuscript and software we used \texttt{optim} in R to perform the one dimensional optimization. However we can also use the following M-step to update the prior variance:
+
+\begin{align}
+\sigma_0^2 = \frac{\sum_{j=1}^p \alpha_j(\sigma_{1j}^2 + \mu_{1j}^2)}{\sum_{j=1}^p \alpha_j}
+\end{align}
+where $\sum_{j=1}^p \alpha_j=1$ so we can drop that term.
+% here is Kaiqian's comparison and why we are still using optim: https://kaiqianzhang.github.io/susie-np/v_methods_comparison_dsc_20190213.html 
 
 \section{Sufficient statistics for \susie}
 

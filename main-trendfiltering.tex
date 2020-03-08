@@ -2,33 +2,10 @@
 \input{preamble}
 \begin{document}
 \singlespacing
-\title{...}
+\title{Implementation Details for SuSiE Trend Filtering}
 \author{Kaiqian Zhang}
 \maketitle
 
-\begin{abstract}
-....
-\end{abstract}
+The derivations are now in the "trendfiltering-derivations" vignette in the {\tt susieR} R package.
 
-\section{Notations}
-
-We now describe the notation used in this text. We denote matrices by
-boldface uppercase letters ($\mathbf{A}$), vectors are denoted by boldface
-lowercase letters ($\mathbf{a}$), and scalars are denoted by non-boldface
-letters ($a$ or $A$). All vectors are column-vectors. Lowercase
-letters may represent elements of a vector or matrix if they have
-subscripts. For example, $a_{ij}$ is the $(i,j)$th element of
-$\mathbf{A}$, $a_i$ is the $i$th element of $\mathbf{a}$, and $\mathbf{a}_{i}$ is
-either the $i$th row or $i$th column of $\mathbf{A}$. For indexing, we
-will generally use capital non-boldface letters to denote the total
-number of elements and their lowercase non-boldface versions to denote
-the index. For example, $i = 1,\ldots,I$. We let $\mathbf{A}_{n \times p}$
-denote that $\mathbf{A} \in \mathbb{R}^{n \times p}$. We denote the matrix
-transpose by $\mathbf{A}^T$, the matrix inverse by $\mathbf{A}^{-1}$,
-and the matrix determinant by $\det(\mathbf{A})$. Finally, sets will be
-denoted by calligraphic letters ($\mathcal{A}$).
-
-\input{trendfiltering}
-\bibliographystyle{chicago}
-\bibliography{references}
 \end{document}
